@@ -5,22 +5,18 @@ import { useState, useRef } from 'react';
 type TipoContrato = 'servico' | 'freelancer' | 'nda';
 
 interface DadosContrato {
-  // Partes
   contratanteNome: string;
   contratanteCpfCnpj: string;
   contratanteEndereco: string;
   contratadoNome: string;
   contratadoCpfCnpj: string;
   contratadoEndereco: string;
-  // Serviço
   descricaoServico: string;
   prazoEntrega: string;
   valor: string;
   formaPagamento: string;
-  // NDA específico
   prazoConfidencialidade: string;
   multaDescumprimento: string;
-  // Geral
   cidade: string;
   foro: string;
 }
@@ -43,11 +39,7 @@ const initialData: DadosContrato = {
 };
 
 function formatDate(date: Date): string {
-  return date.toLocaleDateString('pt-BR', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
+  return date.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 export default function Home() {
@@ -60,309 +52,253 @@ export default function Home() {
     setDados((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handlePrint = () => {
-    window.print();
-  };
+  const handlePrint = () => window.print();
 
   const tiposContrato = [
-    { value: 'servico', label: 'Prestação de Serviços', icon: '📋', desc: 'Contrato padrão de serviços' },
-    { value: 'freelancer', label: 'Freelancer/Autônomo', icon: '💼', desc: 'Para trabalhos pontuais' },
-    { value: 'nda', label: 'Confidencialidade (NDA)', icon: '🔒', desc: 'Proteção de informações' },
+    { value: 'servico', label: 'Prestação de Serviços', desc: 'Contrato formal completo', icon: '📜' },
+    { value: 'freelancer', label: 'Freelancer', desc: 'Para trabalhos pontuais', icon: '✍️' },
+    { value: 'nda', label: 'Confidencialidade', desc: 'Proteção de informações', icon: '🔐' },
   ];
 
   return (
     <>
       <style jsx global>{`
         @media print {
-          body * {
-            visibility: hidden;
-          }
-          #contract-preview, #contract-preview * {
-            visibility: visible;
-          }
+          body * { visibility: hidden; }
+          #contract-preview, #contract-preview * { visibility: visible; }
           #contract-preview {
             position: absolute;
             left: 0;
             top: 0;
             width: 100%;
-            padding: 40px;
-            font-size: 12pt;
-            line-height: 1.6;
+            padding: 60px;
+            background: white !important;
+            color: black !important;
           }
-          .no-print {
-            display: none !important;
-          }
+          .no-print { display: none !important; }
         }
       `}</style>
 
-      <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <main className="min-h-screen bg-[#faf9f7] relative overflow-hidden">
+        {/* Paper texture overlay */}
+        <div className="fixed inset-0 opacity-50 pointer-events-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==')]" />
+        
+        {/* Decorative elements */}
+        <div className="fixed top-0 left-0 w-full h-1 bg-gradient-to-r from-[#1a365d] via-[#2c5282] to-[#1a365d]" />
+
         {/* Header */}
-        <div className="bg-indigo-600 text-white py-8 px-4 no-print">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">
-              📄 Gerador de Contratos
+        <header className="relative z-10 pt-20 pb-16 px-6 no-print">
+          <div className="max-w-3xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#1a365d]/5 rounded-full mb-6">
+              <span className="w-2 h-2 bg-[#1a365d] rounded-full" />
+              <span className="text-[#1a365d] text-sm font-medium tracking-wide">Gerador Gratuito</span>
+            </div>
+            <h1 className="text-5xl md:text-6xl font-serif font-bold text-[#1a365d] mb-4 tracking-tight">
+              Contratos
+              <span className="block text-3xl md:text-4xl font-light text-[#4a5568] mt-2">Profissionais</span>
             </h1>
-            <p className="text-indigo-100 text-lg">
-              Crie contratos profissionais em minutos - 100% grátis
+            <p className="text-[#718096] text-lg max-w-xl mx-auto leading-relaxed">
+              Crie documentos jurídicos elegantes em minutos. Sem cadastro, sem complicação.
             </p>
           </div>
-        </div>
+        </header>
 
-        <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="relative z-10 max-w-4xl mx-auto px-6 pb-20">
           {!showPreview ? (
             <>
-              {/* Tipo de Contrato */}
-              <div className="bg-white rounded-2xl shadow-xl p-6 mb-8 no-print">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                  1. Escolha o tipo de contrato
+              {/* Contract Type Selection */}
+              <div className="bg-white rounded-2xl shadow-sm border border-[#e2e8f0] p-8 mb-8 no-print">
+                <h2 className="text-sm font-semibold text-[#1a365d] uppercase tracking-widest mb-6">
+                  Tipo de Documento
                 </h2>
                 <div className="grid md:grid-cols-3 gap-4">
                   {tiposContrato.map((tipo) => (
                     <button
                       key={tipo.value}
                       onClick={() => setTipoContrato(tipo.value as TipoContrato)}
-                      className={`p-4 rounded-xl border-2 text-left transition-all ${
+                      className={`group relative p-6 rounded-xl text-left transition-all duration-300 ${
                         tipoContrato === tipo.value
-                          ? 'border-indigo-500 bg-indigo-50'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'bg-[#1a365d] text-white shadow-lg shadow-[#1a365d]/20'
+                          : 'bg-[#f7fafc] hover:bg-[#edf2f7] text-[#2d3748]'
                       }`}
                     >
-                      <div className="text-2xl mb-2">{tipo.icon}</div>
-                      <div className="font-semibold">{tipo.label}</div>
-                      <div className="text-sm text-gray-500">{tipo.desc}</div>
+                      <span className="text-3xl mb-3 block">{tipo.icon}</span>
+                      <span className="font-semibold block mb-1">{tipo.label}</span>
+                      <span className={`text-sm ${tipoContrato === tipo.value ? 'text-white/70' : 'text-[#718096]'}`}>
+                        {tipo.desc}
+                      </span>
+                      {tipoContrato === tipo.value && (
+                        <div className="absolute top-4 right-4 w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                          <span className="text-white text-sm">✓</span>
+                        </div>
+                      )}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Formulário */}
-              <div className="bg-white rounded-2xl shadow-xl p-6 mb-8 no-print">
-                <h2 className="text-xl font-semibold text-gray-800 mb-6">
-                  2. Preencha os dados
+              {/* Form */}
+              <div className="bg-white rounded-2xl shadow-sm border border-[#e2e8f0] p-8 mb-8 no-print">
+                <h2 className="text-sm font-semibold text-[#1a365d] uppercase tracking-widest mb-8">
+                  Informações do Contrato
                 </h2>
 
-                <div className="grid md:grid-cols-2 gap-8">
+                <div className="grid md:grid-cols-2 gap-12">
                   {/* Contratante */}
-                  <div className="space-y-4">
-                    <h3 className="font-semibold text-indigo-600 border-b pb-2">
-                      👤 CONTRATANTE
-                    </h3>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Nome completo / Razão Social
-                      </label>
-                      <input
-                        type="text"
-                        value={dados.contratanteNome}
-                        onChange={(e) => updateField('contratanteNome', e.target.value)}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        placeholder="Ex: João da Silva"
-                      />
+                  <div className="space-y-5">
+                    <div className="flex items-center gap-3 pb-3 border-b border-[#e2e8f0]">
+                      <div className="w-8 h-8 rounded-lg bg-[#ebf4ff] flex items-center justify-center text-[#3182ce]">A</div>
+                      <h3 className="font-semibold text-[#2d3748]">Contratante</h3>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        CPF / CNPJ
-                      </label>
-                      <input
-                        type="text"
-                        value={dados.contratanteCpfCnpj}
-                        onChange={(e) => updateField('contratanteCpfCnpj', e.target.value)}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        placeholder="Ex: 123.456.789-00"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Endereço completo
-                      </label>
-                      <input
-                        type="text"
-                        value={dados.contratanteEndereco}
-                        onChange={(e) => updateField('contratanteEndereco', e.target.value)}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        placeholder="Rua, número, bairro, cidade - UF"
-                      />
-                    </div>
+                    {[
+                      { field: 'contratanteNome', label: 'Nome / Razão Social', placeholder: 'Nome completo ou empresa' },
+                      { field: 'contratanteCpfCnpj', label: 'CPF / CNPJ', placeholder: '000.000.000-00' },
+                      { field: 'contratanteEndereco', label: 'Endereço', placeholder: 'Rua, número, cidade - UF' },
+                    ].map((input) => (
+                      <div key={input.field}>
+                        <label className="block text-sm text-[#4a5568] mb-2">{input.label}</label>
+                        <input
+                          type="text"
+                          value={dados[input.field as keyof DadosContrato]}
+                          onChange={(e) => updateField(input.field as keyof DadosContrato, e.target.value)}
+                          placeholder={input.placeholder}
+                          className="w-full px-4 py-3 bg-[#f7fafc] border border-[#e2e8f0] rounded-xl focus:bg-white focus:border-[#3182ce] focus:ring-2 focus:ring-[#3182ce]/20 outline-none transition-all"
+                        />
+                      </div>
+                    ))}
                   </div>
 
                   {/* Contratado */}
-                  <div className="space-y-4">
-                    <h3 className="font-semibold text-indigo-600 border-b pb-2">
-                      👤 CONTRATADO
-                    </h3>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Nome completo / Razão Social
-                      </label>
-                      <input
-                        type="text"
-                        value={dados.contratadoNome}
-                        onChange={(e) => updateField('contratadoNome', e.target.value)}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        placeholder="Ex: Maria Souza"
-                      />
+                  <div className="space-y-5">
+                    <div className="flex items-center gap-3 pb-3 border-b border-[#e2e8f0]">
+                      <div className="w-8 h-8 rounded-lg bg-[#faf5ff] flex items-center justify-center text-[#805ad5]">B</div>
+                      <h3 className="font-semibold text-[#2d3748]">Contratado</h3>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        CPF / CNPJ
-                      </label>
-                      <input
-                        type="text"
-                        value={dados.contratadoCpfCnpj}
-                        onChange={(e) => updateField('contratadoCpfCnpj', e.target.value)}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        placeholder="Ex: 987.654.321-00"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Endereço completo
-                      </label>
-                      <input
-                        type="text"
-                        value={dados.contratadoEndereco}
-                        onChange={(e) => updateField('contratadoEndereco', e.target.value)}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        placeholder="Rua, número, bairro, cidade - UF"
-                      />
-                    </div>
+                    {[
+                      { field: 'contratadoNome', label: 'Nome / Razão Social', placeholder: 'Nome completo ou empresa' },
+                      { field: 'contratadoCpfCnpj', label: 'CPF / CNPJ', placeholder: '000.000.000-00' },
+                      { field: 'contratadoEndereco', label: 'Endereço', placeholder: 'Rua, número, cidade - UF' },
+                    ].map((input) => (
+                      <div key={input.field}>
+                        <label className="block text-sm text-[#4a5568] mb-2">{input.label}</label>
+                        <input
+                          type="text"
+                          value={dados[input.field as keyof DadosContrato]}
+                          onChange={(e) => updateField(input.field as keyof DadosContrato, e.target.value)}
+                          placeholder={input.placeholder}
+                          className="w-full px-4 py-3 bg-[#f7fafc] border border-[#e2e8f0] rounded-xl focus:bg-white focus:border-[#805ad5] focus:ring-2 focus:ring-[#805ad5]/20 outline-none transition-all"
+                        />
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                {/* Serviço */}
-                {tipoContrato !== 'nda' && (
-                  <div className="mt-8 space-y-4">
-                    <h3 className="font-semibold text-indigo-600 border-b pb-2">
-                      📋 OBJETO DO CONTRATO
-                    </h3>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Descrição do serviço
-                      </label>
-                      <textarea
-                        value={dados.descricaoServico}
-                        onChange={(e) => updateField('descricaoServico', e.target.value)}
-                        rows={3}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        placeholder="Descreva detalhadamente o serviço a ser prestado..."
-                      />
+                {/* Service Details */}
+                {tipoContrato !== 'nda' ? (
+                  <div className="mt-10 pt-8 border-t border-[#e2e8f0]">
+                    <h3 className="font-semibold text-[#2d3748] mb-6">Objeto do Contrato</h3>
+                    <div className="space-y-5">
+                      <div>
+                        <label className="block text-sm text-[#4a5568] mb-2">Descrição do serviço</label>
+                        <textarea
+                          value={dados.descricaoServico}
+                          onChange={(e) => updateField('descricaoServico', e.target.value)}
+                          rows={3}
+                          placeholder="Descreva detalhadamente o serviço a ser prestado..."
+                          className="w-full px-4 py-3 bg-[#f7fafc] border border-[#e2e8f0] rounded-xl focus:bg-white focus:border-[#3182ce] focus:ring-2 focus:ring-[#3182ce]/20 outline-none transition-all resize-none"
+                        />
+                      </div>
+                      <div className="grid md:grid-cols-3 gap-5">
+                        <div>
+                          <label className="block text-sm text-[#4a5568] mb-2">Prazo</label>
+                          <input
+                            type="text"
+                            value={dados.prazoEntrega}
+                            onChange={(e) => updateField('prazoEntrega', e.target.value)}
+                            className="w-full px-4 py-3 bg-[#f7fafc] border border-[#e2e8f0] rounded-xl focus:bg-white focus:border-[#3182ce] outline-none transition-all"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm text-[#4a5568] mb-2">Valor (R$)</label>
+                          <input
+                            type="text"
+                            value={dados.valor}
+                            onChange={(e) => updateField('valor', e.target.value)}
+                            placeholder="5.000,00"
+                            className="w-full px-4 py-3 bg-[#f7fafc] border border-[#e2e8f0] rounded-xl focus:bg-white focus:border-[#3182ce] outline-none transition-all"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm text-[#4a5568] mb-2">Pagamento</label>
+                          <input
+                            type="text"
+                            value={dados.formaPagamento}
+                            onChange={(e) => updateField('formaPagamento', e.target.value)}
+                            className="w-full px-4 py-3 bg-[#f7fafc] border border-[#e2e8f0] rounded-xl focus:bg-white focus:border-[#3182ce] outline-none transition-all"
+                          />
+                        </div>
+                      </div>
                     </div>
-                    <div className="grid md:grid-cols-3 gap-4">
+                  </div>
+                ) : (
+                  <div className="mt-10 pt-8 border-t border-[#e2e8f0]">
+                    <h3 className="font-semibold text-[#2d3748] mb-6">Termos de Confidencialidade</h3>
+                    <div className="space-y-5">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Prazo de entrega
-                        </label>
-                        <input
-                          type="text"
-                          value={dados.prazoEntrega}
-                          onChange={(e) => updateField('prazoEntrega', e.target.value)}
-                          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                          placeholder="Ex: 30 dias"
+                        <label className="block text-sm text-[#4a5568] mb-2">Informações protegidas</label>
+                        <textarea
+                          value={dados.descricaoServico}
+                          onChange={(e) => updateField('descricaoServico', e.target.value)}
+                          rows={3}
+                          placeholder="Descreva as informações que serão protegidas..."
+                          className="w-full px-4 py-3 bg-[#f7fafc] border border-[#e2e8f0] rounded-xl focus:bg-white focus:border-[#3182ce] outline-none transition-all resize-none"
                         />
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Valor (R$)
-                        </label>
-                        <input
-                          type="text"
-                          value={dados.valor}
-                          onChange={(e) => updateField('valor', e.target.value)}
-                          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                          placeholder="Ex: 5.000,00"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Forma de pagamento
-                        </label>
-                        <input
-                          type="text"
-                          value={dados.formaPagamento}
-                          onChange={(e) => updateField('formaPagamento', e.target.value)}
-                          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                          placeholder="Ex: 50% entrada, 50% entrega"
-                        />
+                      <div className="grid md:grid-cols-2 gap-5">
+                        <div>
+                          <label className="block text-sm text-[#4a5568] mb-2">Prazo de confidencialidade</label>
+                          <input
+                            type="text"
+                            value={dados.prazoConfidencialidade}
+                            onChange={(e) => updateField('prazoConfidencialidade', e.target.value)}
+                            className="w-full px-4 py-3 bg-[#f7fafc] border border-[#e2e8f0] rounded-xl focus:bg-white focus:border-[#3182ce] outline-none transition-all"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm text-[#4a5568] mb-2">Multa (R$)</label>
+                          <input
+                            type="text"
+                            value={dados.multaDescumprimento}
+                            onChange={(e) => updateField('multaDescumprimento', e.target.value)}
+                            className="w-full px-4 py-3 bg-[#f7fafc] border border-[#e2e8f0] rounded-xl focus:bg-white focus:border-[#3182ce] outline-none transition-all"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
                 )}
 
-                {/* NDA específico */}
-                {tipoContrato === 'nda' && (
-                  <div className="mt-8 space-y-4">
-                    <h3 className="font-semibold text-indigo-600 border-b pb-2">
-                      🔒 TERMOS DE CONFIDENCIALIDADE
-                    </h3>
+                {/* Location */}
+                <div className="mt-10 pt-8 border-t border-[#e2e8f0]">
+                  <div className="grid md:grid-cols-2 gap-5">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Informações confidenciais (descreva)
-                      </label>
-                      <textarea
-                        value={dados.descricaoServico}
-                        onChange={(e) => updateField('descricaoServico', e.target.value)}
-                        rows={3}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        placeholder="Descreva as informações que serão protegidas..."
-                      />
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Prazo de confidencialidade
-                        </label>
-                        <input
-                          type="text"
-                          value={dados.prazoConfidencialidade}
-                          onChange={(e) => updateField('prazoConfidencialidade', e.target.value)}
-                          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                          placeholder="Ex: 2 anos"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Multa por descumprimento (R$)
-                        </label>
-                        <input
-                          type="text"
-                          value={dados.multaDescumprimento}
-                          onChange={(e) => updateField('multaDescumprimento', e.target.value)}
-                          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                          placeholder="Ex: 10.000,00"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Localidade */}
-                <div className="mt-8 space-y-4">
-                  <h3 className="font-semibold text-indigo-600 border-b pb-2">
-                    📍 LOCALIDADE
-                  </h3>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Cidade de assinatura
-                      </label>
+                      <label className="block text-sm text-[#4a5568] mb-2">Cidade de assinatura</label>
                       <input
                         type="text"
                         value={dados.cidade}
                         onChange={(e) => updateField('cidade', e.target.value)}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        placeholder="Ex: São Paulo - SP"
+                        placeholder="São Paulo - SP"
+                        className="w-full px-4 py-3 bg-[#f7fafc] border border-[#e2e8f0] rounded-xl focus:bg-white focus:border-[#3182ce] outline-none transition-all"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Foro (cidade para resolver disputas)
-                      </label>
+                      <label className="block text-sm text-[#4a5568] mb-2">Foro</label>
                       <input
                         type="text"
                         value={dados.foro}
                         onChange={(e) => updateField('foro', e.target.value)}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        placeholder="Ex: Comarca de São Paulo - SP"
+                        placeholder="Comarca de São Paulo - SP"
+                        className="w-full px-4 py-3 bg-[#f7fafc] border border-[#e2e8f0] rounded-xl focus:bg-white focus:border-[#3182ce] outline-none transition-all"
                       />
                     </div>
                   </div>
@@ -370,27 +306,27 @@ export default function Home() {
 
                 <button
                   onClick={() => setShowPreview(true)}
-                  className="mt-8 w-full bg-indigo-600 text-white py-4 rounded-xl font-semibold text-lg hover:bg-indigo-700 transition-colors"
+                  className="mt-10 w-full bg-[#1a365d] text-white py-4 rounded-xl font-semibold text-lg hover:bg-[#2c5282] transition-colors shadow-lg shadow-[#1a365d]/20"
                 >
-                  📄 Gerar Contrato
+                  Gerar Contrato →
                 </button>
               </div>
             </>
           ) : (
             <>
               {/* Preview Actions */}
-              <div className="bg-white rounded-xl shadow-lg p-4 mb-6 flex gap-4 no-print">
+              <div className="bg-white rounded-xl shadow-sm border border-[#e2e8f0] p-4 mb-8 flex flex-wrap gap-3 no-print">
                 <button
                   onClick={() => setShowPreview(false)}
-                  className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-5 py-2.5 border border-[#e2e8f0] rounded-lg hover:bg-[#f7fafc] transition-colors font-medium text-[#4a5568]"
                 >
-                  ← Voltar e Editar
+                  ← Editar
                 </button>
                 <button
                   onClick={handlePrint}
-                  className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                  className="px-5 py-2.5 bg-[#1a365d] text-white rounded-lg hover:bg-[#2c5282] transition-colors font-medium"
                 >
-                  🖨️ Imprimir / Salvar PDF
+                  Imprimir / PDF
                 </button>
               </div>
 
@@ -398,356 +334,122 @@ export default function Home() {
               <div
                 id="contract-preview"
                 ref={printRef}
-                className="bg-white rounded-2xl shadow-xl p-8 md:p-12 max-w-4xl mx-auto"
-                style={{ fontFamily: 'Times New Roman, serif' }}
+                className="bg-white rounded-2xl shadow-lg border border-[#e2e8f0] p-12 md:p-16 max-w-3xl mx-auto"
+                style={{ fontFamily: 'Georgia, serif' }}
               >
-                {tipoContrato === 'servico' && (
-                  <ContratoServico dados={dados} />
-                )}
-                {tipoContrato === 'freelancer' && (
-                  <ContratoFreelancer dados={dados} />
-                )}
-                {tipoContrato === 'nda' && (
-                  <ContratoNDA dados={dados} />
-                )}
+                <ContractContent tipo={tipoContrato} dados={dados} />
               </div>
             </>
           )}
-
-          {/* CTA */}
-          <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl shadow-xl p-8 text-white text-center mt-8 no-print">
-            <h3 className="text-2xl font-bold mb-3">
-              📊 Precisa organizar suas finanças?
-            </h3>
-            <p className="text-purple-100 mb-6">
-              Confira nossas outras ferramentas gratuitas!
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <a
-                href="https://curva-abc-app.vercel.app"
-                target="_blank"
-                className="bg-white text-purple-600 px-6 py-3 rounded-xl font-semibold hover:bg-purple-50 transition-colors"
-              >
-                🎯 Curva ABC
-              </a>
-            </div>
-          </div>
-
-          {/* Footer */}
-          <footer className="mt-12 text-center text-gray-500 text-sm no-print">
-            <p>Gerador de Contratos © 2025 • Documento informativo</p>
-            <p className="mt-1">
-              Recomendamos revisão por advogado para contratos de alto valor.
-            </p>
-          </footer>
         </div>
+
+        {/* Footer */}
+        <footer className="relative z-10 text-center py-8 border-t border-[#e2e8f0] no-print">
+          <p className="text-[#a0aec0] text-sm">
+            Gerador de Contratos © 2025 • Recomendamos revisão por advogado
+          </p>
+        </footer>
       </main>
     </>
   );
 }
 
-// Contrato de Prestação de Serviços
-function ContratoServico({ dados }: { dados: DadosContrato }) {
+function ContractContent({ tipo, dados }: { tipo: TipoContrato; dados: DadosContrato }) {
+  const titles = {
+    servico: 'CONTRATO DE PRESTAÇÃO DE SERVIÇOS',
+    freelancer: 'CONTRATO DE PRESTAÇÃO DE SERVIÇOS AUTÔNOMOS',
+    nda: 'TERMO DE CONFIDENCIALIDADE E SIGILO',
+  };
+
   return (
-    <div className="space-y-6 text-justify leading-relaxed">
-      <h1 className="text-2xl font-bold text-center mb-8">
-        CONTRATO DE PRESTAÇÃO DE SERVIÇOS
+    <div className="space-y-6 text-justify leading-relaxed text-[#2d3748]">
+      <h1 className="text-2xl font-bold text-center tracking-wide text-[#1a365d] pb-6 border-b border-[#e2e8f0]">
+        {titles[tipo]}
       </h1>
 
-      <p>
-        Pelo presente instrumento particular, de um lado <strong>{dados.contratanteNome || '[NOME DO CONTRATANTE]'}</strong>, 
-        inscrito no CPF/CNPJ sob o nº <strong>{dados.contratanteCpfCnpj || '[CPF/CNPJ]'}</strong>, 
-        com endereço em <strong>{dados.contratanteEndereco || '[ENDEREÇO]'}</strong>, 
-        doravante denominado <strong>CONTRATANTE</strong>, e de outro lado <strong>{dados.contratadoNome || '[NOME DO CONTRATADO]'}</strong>, 
-        inscrito no CPF/CNPJ sob o nº <strong>{dados.contratadoCpfCnpj || '[CPF/CNPJ]'}</strong>, 
-        com endereço em <strong>{dados.contratadoEndereco || '[ENDEREÇO]'}</strong>, 
-        doravante denominado <strong>CONTRATADO</strong>, têm entre si justo e acordado o presente contrato, 
-        mediante as cláusulas e condições seguintes:
+      <p className="text-[15px]">
+        Pelo presente instrumento particular, de um lado <strong>{dados.contratanteNome || '[CONTRATANTE]'}</strong>, 
+        inscrito no CPF/CNPJ sob o nº <strong>{dados.contratanteCpfCnpj || '[DOCUMENTO]'}</strong>
+        {dados.contratanteEndereco && `, com endereço em ${dados.contratanteEndereco}`}, 
+        doravante denominado <strong>CONTRATANTE</strong>, e de outro lado <strong>{dados.contratadoNome || '[CONTRATADO]'}</strong>, 
+        inscrito no CPF/CNPJ sob o nº <strong>{dados.contratadoCpfCnpj || '[DOCUMENTO]'}</strong>
+        {dados.contratadoEndereco && `, com endereço em ${dados.contratadoEndereco}`}, 
+        doravante denominado <strong>CONTRATADO</strong>, têm entre si justo e acordado o presente contrato.
       </p>
 
+      {tipo !== 'nda' && (
+        <>
+          <div>
+            <h2 className="font-bold text-[#1a365d] mt-8 mb-3">CLÁUSULA PRIMEIRA – DO OBJETO</h2>
+            <p className="text-[15px]">
+              O presente contrato tem por objeto: <strong>{dados.descricaoServico || '[DESCRIÇÃO DO SERVIÇO]'}</strong>.
+            </p>
+          </div>
+
+          <div>
+            <h2 className="font-bold text-[#1a365d] mt-8 mb-3">CLÁUSULA SEGUNDA – DO PRAZO</h2>
+            <p className="text-[15px]">
+              O prazo para execução é de <strong>{dados.prazoEntrega || '[PRAZO]'}</strong>, contados da assinatura.
+            </p>
+          </div>
+
+          <div>
+            <h2 className="font-bold text-[#1a365d] mt-8 mb-3">CLÁUSULA TERCEIRA – DO VALOR</h2>
+            <p className="text-[15px]">
+              Pela execução, o CONTRATANTE pagará ao CONTRATADO <strong>R$ {dados.valor || '[VALOR]'}</strong>, 
+              na forma: <strong>{dados.formaPagamento || '[FORMA DE PAGAMENTO]'}</strong>.
+            </p>
+          </div>
+        </>
+      )}
+
+      {tipo === 'nda' && (
+        <>
+          <div>
+            <h2 className="font-bold text-[#1a365d] mt-8 mb-3">1. INFORMAÇÕES CONFIDENCIAIS</h2>
+            <p className="text-[15px]">
+              Consideram-se confidenciais: <strong>{dados.descricaoServico || '[DESCRIÇÃO]'}</strong>.
+            </p>
+          </div>
+
+          <div>
+            <h2 className="font-bold text-[#1a365d] mt-8 mb-3">2. PRAZO</h2>
+            <p className="text-[15px]">
+              Vigência de <strong>{dados.prazoConfidencialidade || '2 anos'}</strong> após a assinatura.
+            </p>
+          </div>
+
+          <div>
+            <h2 className="font-bold text-[#1a365d] mt-8 mb-3">3. PENALIDADE</h2>
+            <p className="text-[15px]">
+              Multa de <strong>R$ {dados.multaDescumprimento || '10.000,00'}</strong> por descumprimento.
+            </p>
+          </div>
+        </>
+      )}
+
       <div>
-        <h2 className="font-bold mt-6 mb-2">CLÁUSULA PRIMEIRA – DO OBJETO</h2>
-        <p>
-          O presente contrato tem por objeto a prestação dos seguintes serviços pelo CONTRATADO ao CONTRATANTE: <strong>{dados.descricaoServico || '[DESCRIÇÃO DO SERVIÇO]'}</strong>.
+        <h2 className="font-bold text-[#1a365d] mt-8 mb-3">{tipo === 'nda' ? '4. FORO' : 'CLÁUSULA QUARTA – DO FORO'}</h2>
+        <p className="text-[15px]">
+          Fica eleito o foro da <strong>{dados.foro || '[COMARCA]'}</strong>.
         </p>
       </div>
 
-      <div>
-        <h2 className="font-bold mt-6 mb-2">CLÁUSULA SEGUNDA – DO PRAZO</h2>
-        <p>
-          O prazo para execução dos serviços é de <strong>{dados.prazoEntrega || '[PRAZO]'}</strong>, contados a partir da assinatura deste contrato, podendo ser prorrogado mediante acordo entre as partes.
-        </p>
-      </div>
-
-      <div>
-        <h2 className="font-bold mt-6 mb-2">CLÁUSULA TERCEIRA – DO VALOR E PAGAMENTO</h2>
-        <p>
-          Pela execução dos serviços, o CONTRATANTE pagará ao CONTRATADO o valor de <strong>R$ {dados.valor || '[VALOR]'}</strong> ({dados.valor ? `${dados.valor} reais` : '[VALOR POR EXTENSO]'}), da seguinte forma: <strong>{dados.formaPagamento || '[FORMA DE PAGAMENTO]'}</strong>.
-        </p>
-      </div>
-
-      <div>
-        <h2 className="font-bold mt-6 mb-2">CLÁUSULA QUARTA – DAS OBRIGAÇÕES DO CONTRATADO</h2>
-        <p>O CONTRATADO obriga-se a:</p>
-        <p>a) Executar os serviços com zelo e dedicação;</p>
-        <p>b) Cumprir os prazos estabelecidos;</p>
-        <p>c) Manter sigilo sobre informações confidenciais;</p>
-        <p>d) Comunicar imediatamente qualquer impedimento na execução.</p>
-      </div>
-
-      <div>
-        <h2 className="font-bold mt-6 mb-2">CLÁUSULA QUINTA – DAS OBRIGAÇÕES DO CONTRATANTE</h2>
-        <p>O CONTRATANTE obriga-se a:</p>
-        <p>a) Efetuar os pagamentos nas datas acordadas;</p>
-        <p>b) Fornecer as informações necessárias para execução dos serviços;</p>
-        <p>c) Comunicar alterações de escopo com antecedência razoável.</p>
-      </div>
-
-      <div>
-        <h2 className="font-bold mt-6 mb-2">CLÁUSULA SEXTA – DA RESCISÃO</h2>
-        <p>
-          O presente contrato poderá ser rescindido por qualquer das partes, mediante comunicação por escrito com antecedência mínima de 15 (quinze) dias, ficando ressalvado o pagamento pelos serviços já executados.
-        </p>
-      </div>
-
-      <div>
-        <h2 className="font-bold mt-6 mb-2">CLÁUSULA SÉTIMA – DO FORO</h2>
-        <p>
-          Fica eleito o foro da <strong>{dados.foro || '[COMARCA]'}</strong> para dirimir quaisquer dúvidas ou controvérsias oriundas deste contrato, com renúncia expressa a qualquer outro, por mais privilegiado que seja.
-        </p>
-      </div>
-
-      <p className="mt-8">
-        E por estarem assim justas e contratadas, as partes assinam o presente instrumento em 2 (duas) vias de igual teor e forma, na presença de 2 (duas) testemunhas.
-      </p>
-
-      <p className="mt-8 text-center">
+      <p className="mt-10 text-center text-[15px]">
         {dados.cidade || '[CIDADE]'}, {formatDate(new Date())}.
       </p>
 
-      <div className="mt-16 grid grid-cols-2 gap-8">
+      <div className="mt-20 grid grid-cols-2 gap-16">
         <div className="text-center">
-          <div className="border-t border-black pt-2">
-            <p><strong>CONTRATANTE</strong></p>
-            <p>{dados.contratanteNome || '[NOME]'}</p>
-            <p>CPF/CNPJ: {dados.contratanteCpfCnpj || '[CPF/CNPJ]'}</p>
+          <div className="border-t-2 border-[#1a365d] pt-3">
+            <p className="font-semibold text-[#1a365d]">CONTRATANTE</p>
+            <p className="text-sm text-[#4a5568]">{dados.contratanteNome || '[Nome]'}</p>
           </div>
         </div>
         <div className="text-center">
-          <div className="border-t border-black pt-2">
-            <p><strong>CONTRATADO</strong></p>
-            <p>{dados.contratadoNome || '[NOME]'}</p>
-            <p>CPF/CNPJ: {dados.contratadoCpfCnpj || '[CPF/CNPJ]'}</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-12 grid grid-cols-2 gap-8">
-        <div className="text-center">
-          <div className="border-t border-black pt-2">
-            <p><strong>TESTEMUNHA 1</strong></p>
-            <p>Nome: ______________________</p>
-            <p>CPF: ______________________</p>
-          </div>
-        </div>
-        <div className="text-center">
-          <div className="border-t border-black pt-2">
-            <p><strong>TESTEMUNHA 2</strong></p>
-            <p>Nome: ______________________</p>
-            <p>CPF: ______________________</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Contrato Freelancer
-function ContratoFreelancer({ dados }: { dados: DadosContrato }) {
-  return (
-    <div className="space-y-6 text-justify leading-relaxed">
-      <h1 className="text-2xl font-bold text-center mb-8">
-        CONTRATO DE PRESTAÇÃO DE SERVIÇOS AUTÔNOMOS
-      </h1>
-
-      <p>
-        Pelo presente instrumento particular, <strong>{dados.contratanteNome || '[NOME DO CONTRATANTE]'}</strong>, 
-        CPF/CNPJ <strong>{dados.contratanteCpfCnpj || '[CPF/CNPJ]'}</strong>, 
-        endereço <strong>{dados.contratanteEndereco || '[ENDEREÇO]'}</strong>, 
-        doravante denominado <strong>CLIENTE</strong>, e <strong>{dados.contratadoNome || '[NOME DO FREELANCER]'}</strong>, 
-        CPF <strong>{dados.contratadoCpfCnpj || '[CPF]'}</strong>, 
-        endereço <strong>{dados.contratadoEndereco || '[ENDEREÇO]'}</strong>, 
-        doravante denominado <strong>FREELANCER</strong>, acordam:
-      </p>
-
-      <div>
-        <h2 className="font-bold mt-6 mb-2">1. SERVIÇO</h2>
-        <p><strong>{dados.descricaoServico || '[DESCRIÇÃO DO SERVIÇO]'}</strong></p>
-      </div>
-
-      <div>
-        <h2 className="font-bold mt-6 mb-2">2. PRAZO</h2>
-        <p><strong>{dados.prazoEntrega || '[PRAZO]'}</strong> a partir da data de assinatura.</p>
-      </div>
-
-      <div>
-        <h2 className="font-bold mt-6 mb-2">3. VALOR</h2>
-        <p><strong>R$ {dados.valor || '[VALOR]'}</strong></p>
-        <p>Forma de pagamento: <strong>{dados.formaPagamento || '[FORMA DE PAGAMENTO]'}</strong></p>
-      </div>
-
-      <div>
-        <h2 className="font-bold mt-6 mb-2">4. RELAÇÃO DE TRABALHO</h2>
-        <p>
-          Fica expressamente estabelecido que não há qualquer vínculo empregatício entre as partes, 
-          sendo o FREELANCER profissional autônomo, responsável pelos seus próprios tributos e obrigações fiscais.
-        </p>
-      </div>
-
-      <div>
-        <h2 className="font-bold mt-6 mb-2">5. PROPRIEDADE INTELECTUAL</h2>
-        <p>
-          Após o pagamento integral, todos os direitos sobre o trabalho entregue serão transferidos ao CLIENTE.
-        </p>
-      </div>
-
-      <div>
-        <h2 className="font-bold mt-6 mb-2">6. REVISÕES</h2>
-        <p>
-          Estão incluídas até 2 (duas) rodadas de revisão. Revisões adicionais serão cobradas à parte.
-        </p>
-      </div>
-
-      <div>
-        <h2 className="font-bold mt-6 mb-2">7. FORO</h2>
-        <p>Comarca de <strong>{dados.foro || '[COMARCA]'}</strong>.</p>
-      </div>
-
-      <p className="mt-8 text-center">
-        {dados.cidade || '[CIDADE]'}, {formatDate(new Date())}.
-      </p>
-
-      <div className="mt-12 grid grid-cols-2 gap-8">
-        <div className="text-center">
-          <div className="border-t border-black pt-2">
-            <p><strong>CLIENTE</strong></p>
-            <p>{dados.contratanteNome || '[NOME]'}</p>
-          </div>
-        </div>
-        <div className="text-center">
-          <div className="border-t border-black pt-2">
-            <p><strong>FREELANCER</strong></p>
-            <p>{dados.contratadoNome || '[NOME]'}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Contrato NDA
-function ContratoNDA({ dados }: { dados: DadosContrato }) {
-  return (
-    <div className="space-y-6 text-justify leading-relaxed">
-      <h1 className="text-2xl font-bold text-center mb-8">
-        TERMO DE CONFIDENCIALIDADE E SIGILO (NDA)
-      </h1>
-
-      <p>
-        Pelo presente instrumento, <strong>{dados.contratanteNome || '[PARTE REVELADORA]'}</strong>, 
-        CPF/CNPJ <strong>{dados.contratanteCpfCnpj || '[CPF/CNPJ]'}</strong>, 
-        doravante denominado <strong>PARTE REVELADORA</strong>, e <strong>{dados.contratadoNome || '[PARTE RECEPTORA]'}</strong>, 
-        CPF/CNPJ <strong>{dados.contratadoCpfCnpj || '[CPF/CNPJ]'}</strong>, 
-        doravante denominado <strong>PARTE RECEPTORA</strong>, acordam os seguintes termos de confidencialidade:
-      </p>
-
-      <div>
-        <h2 className="font-bold mt-6 mb-2">1. INFORMAÇÕES CONFIDENCIAIS</h2>
-        <p>
-          Consideram-se informações confidenciais todas as informações, dados, documentos, 
-          know-how, segredos comerciais, estratégias, planos de negócio, códigos-fonte, 
-          algoritmos, processos, técnicas, desenhos, especificações e quaisquer outras 
-          informações, sejam elas orais, escritas ou em qualquer outro formato, incluindo:
-        </p>
-        <p className="mt-2"><strong>{dados.descricaoServico || '[DESCRIÇÃO DAS INFORMAÇÕES]'}</strong></p>
-      </div>
-
-      <div>
-        <h2 className="font-bold mt-6 mb-2">2. OBRIGAÇÕES DA PARTE RECEPTORA</h2>
-        <p>A PARTE RECEPTORA compromete-se a:</p>
-        <p>a) Manter sigilo absoluto sobre todas as informações confidenciais;</p>
-        <p>b) Não divulgar, publicar, reproduzir ou transmitir as informações a terceiros;</p>
-        <p>c) Utilizar as informações apenas para os fins expressamente autorizados;</p>
-        <p>d) Devolver ou destruir todas as informações ao término deste acordo;</p>
-        <p>e) Notificar imediatamente qualquer uso ou divulgação não autorizada.</p>
-      </div>
-
-      <div>
-        <h2 className="font-bold mt-6 mb-2">3. PRAZO</h2>
-        <p>
-          Este termo terá vigência pelo período de <strong>{dados.prazoConfidencialidade || '2 anos'}</strong>, 
-          contados a partir da data de assinatura, permanecendo em vigor mesmo após o término 
-          de qualquer relação comercial entre as partes.
-        </p>
-      </div>
-
-      <div>
-        <h2 className="font-bold mt-6 mb-2">4. PENALIDADES</h2>
-        <p>
-          O descumprimento de qualquer obrigação prevista neste termo sujeitará a PARTE RECEPTORA 
-          ao pagamento de multa no valor de <strong>R$ {dados.multaDescumprimento || '10.000,00'}</strong>, 
-          sem prejuízo de indenização por perdas e danos.
-        </p>
-      </div>
-
-      <div>
-        <h2 className="font-bold mt-6 mb-2">5. EXCEÇÕES</h2>
-        <p>Não são consideradas confidenciais as informações que:</p>
-        <p>a) Já eram de conhecimento público antes da divulgação;</p>
-        <p>b) Tornaram-se públicas sem culpa da PARTE RECEPTORA;</p>
-        <p>c) Foram obtidas legalmente de terceiros sem restrição de confidencialidade;</p>
-        <p>d) Devam ser divulgadas por força de lei ou ordem judicial.</p>
-      </div>
-
-      <div>
-        <h2 className="font-bold mt-6 mb-2">6. FORO</h2>
-        <p>Comarca de <strong>{dados.foro || '[COMARCA]'}</strong>.</p>
-      </div>
-
-      <p className="mt-8 text-center">
-        {dados.cidade || '[CIDADE]'}, {formatDate(new Date())}.
-      </p>
-
-      <div className="mt-12 grid grid-cols-2 gap-8">
-        <div className="text-center">
-          <div className="border-t border-black pt-2">
-            <p><strong>PARTE REVELADORA</strong></p>
-            <p>{dados.contratanteNome || '[NOME]'}</p>
-            <p>CPF/CNPJ: {dados.contratanteCpfCnpj || '[CPF/CNPJ]'}</p>
-          </div>
-        </div>
-        <div className="text-center">
-          <div className="border-t border-black pt-2">
-            <p><strong>PARTE RECEPTORA</strong></p>
-            <p>{dados.contratadoNome || '[NOME]'}</p>
-            <p>CPF/CNPJ: {dados.contratadoCpfCnpj || '[CPF/CNPJ]'}</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-12 grid grid-cols-2 gap-8">
-        <div className="text-center">
-          <div className="border-t border-black pt-2">
-            <p><strong>TESTEMUNHA 1</strong></p>
-            <p>Nome: ______________________</p>
-            <p>CPF: ______________________</p>
-          </div>
-        </div>
-        <div className="text-center">
-          <div className="border-t border-black pt-2">
-            <p><strong>TESTEMUNHA 2</strong></p>
-            <p>Nome: ______________________</p>
-            <p>CPF: ______________________</p>
+          <div className="border-t-2 border-[#1a365d] pt-3">
+            <p className="font-semibold text-[#1a365d]">CONTRATADO</p>
+            <p className="text-sm text-[#4a5568]">{dados.contratadoNome || '[Nome]'}</p>
           </div>
         </div>
       </div>
