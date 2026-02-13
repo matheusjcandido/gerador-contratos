@@ -346,7 +346,7 @@ export default function Home() {
         {/* Footer */}
         <footer className="relative z-10 text-center py-8 border-t border-[#e2e8f0] no-print">
           <p className="text-[#a0aec0] text-sm">
-            Gerador de Contratos © 2025 • Recomendamos revisão por advogado
+            Gerador de Contratos © 2026 • Recomendamos revisão por advogado
           </p>
         </footer>
       </main>
